@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Барахолка — ПДА-2М</title>
+<style>
+  :root {
+    --bg: #0b0e08; --panel: #12180d; --panel2: #0d1208;
+    --line: #3a4628; --line2: #5a6b3c; --text: #d9dcc6; --dim: #9aa085;
+    --amber: #e3a72f; --amber2: #ffd36b; --muted: #6f7957; --red: #d2644a;
+    --green: #a3c05b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 40px;
+    background: radial-gradient(900px 500px at 50% 0%, #1a2412, transparent 70%), var(--bg);
+    color: var(--text);
+    font: 14px/1.5 "Segoe UI", Arial, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 22px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  h1 { margin: 0; font-size: 22px; letter-spacing: .12em; color: var(--amber2); font-family: "Consolas", monospace; }
+  .sub { color: var(--muted); font-size: 12px; font-family: "Consolas", monospace; margin-top: 6px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  .tab { padding: 8px 14px; border: 1px solid var(--line); background: var(--panel); color: var(--dim); cursor: pointer; font: 12px "Consolas", monospace; letter-spacing: .08em; }
+  .tab:hover { border-color: var(--line2); color: var(--text); }
+  .tab.active { border-color: var(--amber); color: var(--amber2); background: rgba(227,167,47,.1); }
+  .tab .n { color: var(--muted); margin-left: 6px; }
+  .tab.active .n { color: var(--amber); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: center; }
+  input[type=search] {
+    flex: 1 1 260px; min-width: 200px; height: 38px; padding: 0 12px;
+    background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--text);
+    font: 14px "Consolas", monospace;
+  }
+  input[type=search]:focus { outline: none; border-color: var(--amber); }
+  .stat { font: 12px "Consolas", monospace; color: var(--muted); }
+  .note { font: 11px/1.5 "Consolas", monospace; color: var(--muted); border-left: 2px solid var(--line2); padding-left: 10px; margin-bottom: 18px; }
+  .group-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  .group-head h2 { margin: 0; font-size: 16px; letter-spacing: .14em; color: var(--amber); font-family: "Consolas", monospace; }
+  .group-head .count { font: 11px "Consolas", monospace; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .card { position: relative; border: 1px solid var(--line); background: var(--panel); padding: 12px; padding-bottom: 30px; }
+  .card:hover { border-color: var(--line2); }
+  .card-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .card-name { font-weight: 700; color: var(--amber2); }
+  .card-price { font: 12px "Consolas", monospace; color: var(--green); white-space: nowrap; }
+  .card-meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { font: 10px "Consolas", monospace; border: 1px solid var(--line); padding: 1px 5px; color: var(--dim); }
+  .chip.val { border-color: var(--line2); color: var(--amber); }
+  .chip.uses { border-color: var(--green); color: var(--green); }
+  .chip.heavy { border-color: var(--red); color: var(--red); font-size: 10px; line-height: 1; padding: 1px 5px; }
+  .heavy-icon { width: 12px; height: 12px; fill: currentColor; display: block; }
+  .needs { position: absolute; right: 10px; bottom: 8px; display: flex; gap: 6px; align-items: center; }
+  .needs-row { display: flex; align-items: center; justify-content: flex-end; gap: 3px; min-height: 14px; height: 14px; }
+  .dot-hunger { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #e3a72f; box-shadow: 0 0 3px rgba(227,167,47,.6); vertical-align: middle; }
+  .dot-hunger.half { background: linear-gradient(90deg, #e3a72f 50%, transparent 50%); border: 1px solid #e3a72f; box-sizing: border-box; }
+  .drop { width: 10px; height: 10px; display: inline-flex; align-items: center; justify-content: center; }
+  .drop svg { width: 10px; height: 10px; display: block; }
+  .drop.blue { color: #4aa3d8; }
+  .drop.red { color: #d2644a; }
+  .needs-label { display: none; }
+  .token { font: 12px/14px "Consolas", monospace; display: inline-flex; align-items: center; gap: 2px; height: 14px; }
+  .token svg { width: 14px; height: 14px; }
+  .token.mood { color: #d6b04a; }
+  .token.vigor { color: #f0c040; }
+  .token.alert { color: #5fb8d6; }
+  .token.neg { color: var(--red); }
+  .meat-variants { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .meat-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .meat-label { font: 10px "Consolas", monospace; letter-spacing: .06em; color: var(--amber); min-width: 78px; }
+  .rad-icon { font-size: 15px; color: #f2d04b; line-height: 1; text-shadow: 0 0 5px rgba(242,208,75,.6); }
+  .tox-icon { width: 15px; height: 15px; color: #8fbf4a; filter: drop-shadow(0 0 4px rgba(143,191,74,.7)); }
+  .var-dot { width: 9px; height: 9px; border-radius: 50%; background: #e3a72f; display: inline-block; }
+  .quality-box { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .quality-box input { width: 56px; height: 26px; padding: 0 6px; background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--amber2); font: 12px "Consolas", monospace; }
+  .quality-box button { height: 26px; padding: 0 8px; border: 1px solid var(--line2); background: var(--panel); color: var(--dim); cursor: pointer; font: 10px "Consolas", monospace; }
+  .quality-box button:hover { border-color: var(--amber); color: var(--text); }
+  .quality-dice { font: 10px "Consolas", monospace; color: var(--muted); }
+  .quality-result { font: 12px "Consolas", monospace; color: var(--green); font-weight: 700; }
+  .subhead { grid-column: 1 / -1; margin: 12px 0 2px; font: 12px "Consolas", monospace; letter-spacing: .1em; color: var(--amber); border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+  .subnote { grid-column: 1 / -1; margin: 0 0 6px; font: 10px "Consolas", monospace; color: var(--muted); }
+  .desc { margin-top: 8px; font-size: 12.5px; color: var(--dim); white-space: pre-line; line-height: 1.45; }
+  .card.missing { border-style: dashed; opacity: .65; }
+  .card.missing .card-name { color: var(--red); }
+  .empty { color: var(--muted); font: 12px "Consolas", monospace; padding: 20px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ПДА-2М // БАРАХОЛКА</h1>
+    <div class="sub" id="source">загрузка…</div>
+  </header>
+  <div class="tabs" id="tabs"></div>
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Поиск по названию или описанию…" autocomplete="off">
+    <span class="stat" id="stat"></span>
+  </div>
+  <div class="note" id="note"></div>
+  <div id="content"><div class="empty">Читаю items-catalog.json…</div></div>
+</div>
+<script>
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el = (id) => document.getElementById(id);
+let currentGroup = 0;
+
+function cardHtml(it) {
+  const priceText = it.price || '';
+  const vals = Array.isArray(it.values) ? it.values : [];
+  const chips = vals.map(v => '<span class="chip val">' + esc(v) + '</span>').join('');
+  const uses = it.uses ? '<span class="chip uses">' + esc(it.uses) + ' исп.</span>' : '';
+  const freq = it.frequency ? '<span class="chip val">' + esc(it.frequency) + '</span>' : '';
+  const heavy = it.heavy ? '<span class="chip heavy" title="Тяжёлый предмет"><svg class="heavy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v1.2A6.5 6.5 0 1 0 18 9.2V8a6 6 0 0 0-6-6zm0 2.5a3.5 3.5 0 0 1 3.5 3.5v1a6.5 6.5 0 0 0-7 0V8A3.5 3.5 0 0 1 12 4.5z"/></svg></span>' : '';
+  const volume = it.volume ? '<span class="chip val" title="Объём">' + esc(it.volume.units) + ' ед. (' + esc(it.volume.liters) + ' л)</span>' : '';
+  const perSlot = it.perSlot ? '<span class="chip uses" title="В слоте">' + esc(it.perSlot) + ' в слоте</span>' : '';
+  const days = it.days ? '<span class="chip uses" title="Суток">' + esc(it.days) + ' суток</span>' : '';
+  // Не дублируем число: если оно уже выведено как «N исп.», убираем его из values.
+  let shownVals = (it.volume || it.perSlot) ? [] : vals.slice();
+  if (it.uses && it.uses !== 1) {
+    shownVals = shownVals.filter(v => {
+      const n = Number(String(v).match(/^(\d+)/)?.[1]);
+      return !(Number.isFinite(n) && n === it.uses && /^\d+(\/\d+)?$/.test(String(v).trim()));
+    });
+  }
+  const chips2 = shownVals.map(v => '<span class="chip val">' + esc(v) + '</span>').join('');
+  const desc = (it.description || '').trim();
+
+  // Утоление голода (оранжевые кружки) и жажды (капли)
+  let needsHtml = '';
+  const h = Number(it.hunger) || 0;
+  const t = Number(it.thirst) || 0;
+  {
+    let dots = '';
+    const whole = Math.floor(h);
+    for (let i = 0; i < whole; i++) dots += '<span class="dot-hunger"></span>';
+    if (h - whole >= 0.25) dots += '<span class="dot-hunger half"></span>';
+    let drops = '';
+    const DROP_SVG = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 0 L14 7 A7 7 0 0 1 0 7 Z" fill="currentColor"/></svg>';
+    // визуально 10x10 — тот же размер, что у кружков голода
+    if (t > 0) for (let i = 0; i < t; i++) drops += '<span class="drop blue">' + DROP_SVG + '</span>';
+    if (t < 0) for (let i = 0; i < Math.abs(t); i++) drops += '<span class="drop red">' + DROP_SVG + '</span>';
+    const MOOD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M8.7 10.2h.01M15.3 10.2h.01"/><path d="M8.4 14.2c1 1.3 2.2 2 3.6 2s2.6-.7 3.6-2"/></svg>';
+    const VIGOR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.94 6.02 6.62.96-4.79 4.67 1.13 6.6L12 17.34l-5.9 3.11 1.13-6.6-4.79-4.67 6.62-.96z"/></svg>';
+    const ALERT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>';
+    const m = Number(it.mood) || 0;
+    const v = Number(it.vigor) || 0;
+    const a = Number(it.alertness) || 0;
+    let tokens = '';
+    if (m) tokens += '<span class="token mood' + (m < 0 ? ' neg' : '') + '">' + MOOD_SVG + (m > 0 ? '+' : '') + m + '</span>';
+    if (v) tokens += '<span class="token vigor' + (v < 0 ? ' neg' : '') + '">' + VIGOR_SVG + (v > 0 ? '+' : '') + v + '</span>';
+    if (a) tokens += '<span class="token alert' + (a < 0 ? ' neg' : '') + '">' + ALERT_SVG + (a > 0 ? '+' : '') + a + '</span>';
+    needsHtml = '<div class="needs">'
+      + (dots ? '<div class="needs-row">' + dots + '</div>' : '')
+      + (drops ? '<div class="needs-row">' + drops + '</div>' : '')
+      + (tokens ? '<div class="needs-row">' + tokens + '</div>' : '')
+      + '</div>';
+  }
+
+  // Мясо мутантов: два варианта описания в одной карточке
+  let meatHtml = '';
+  if (it.meat && it.raw && it.cooked) {
+    const RAD = '<span class="rad-icon">☢</span>';
+    const TOX = '<svg class="tox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3h6M10 3v4L7 14a4 4 0 0 0 3.5 6h3A4 4 0 0 0 17 14L14 7V3"/></svg>';
+    const variant = (label, v) => {
+      let parts = '';
+      for (let i = 0; i < (v.hunger || 0); i++) parts += '<span class="var-dot"></span>';
+      if (v.rad) parts += RAD + '<span class="token">' + v.rad + '</span>';
+      if (v.intox) parts += TOX + '<span class="token">' + v.intox + '</span>';
+      return '<div class="meat-row"><span class="meat-label">' + label + '</span>' + (parts || '<span class="token">—</span>') + '</div>';
+    };
+    meatHtml = '<div class="meat-variants">' + variant('СЫРОЕ:', it.raw) + variant('ГОТОВОЕ:', it.cooked) + '</div>';
+  }
+
+  // Ценные предметы: выбор качества и пересчёт цены
+  let qualityHtml = '';
+  if (it.dice && it.basePrice) {
+    const { count, sides } = it.dice;
+    const id = 'q-' + String(it.name).replace(/[^A-Za-z0-9]/g, '') + '-' + Math.random().toString(36).slice(2, 7);
+    const min = count, max = count * sides;
+    qualityHtml = '<div class="quality-box" data-base="' + it.basePrice + '" data-count="' + count + '" data-sides="' + sides + '" data-id="' + id + '">'
+      + '<span class="quality-dice">' + count + 'к' + sides + ' (' + min + '–' + max + ')</span>'
+      + '<input type="number" min="' + min + '" max="' + max + '" placeholder="качество" aria-label="Качество">'
+      + '<button type="button" class="roll-quality">БРОСИТЬ</button>'
+      + '<span class="quality-result">—</span>'
+      + '</div>';
+  }
+
+  return '<article class="card' + (it.found === false ? ' missing' : '') + '">'
+    + '<div class="card-head"><span class="card-name">' + esc(it.name) + '</span><span class="card-price">' + esc(priceText) + '</span></div>'
+    + '<div class="card-meta">' + uses + days + perSlot + freq + chips2 + volume + heavy + '</div>'
+    + '<div class="desc">' + (it.found === false ? 'НЕ НАЙДЕНО В БАЗЕ' : esc(desc)) + '</div>'
+    + meatHtml
+    + needsHtml
+    + qualityHtml
+    + '</article>';
+}
+
+function render(query = '') {
+  const data = window.__catalog;
+  if (!data) return;
+  const groups = Array.isArray(data) ? data : [data];
+  if (currentGroup >= groups.length) currentGroup = 0;
+  const g = groups[currentGroup];
+  const items = Array.isArray(g.items) ? g.items : [];
+  const q = query.trim().toLowerCase();
+  const match = items.filter(it => !q || (it.name + ' ' + (it.description || '')).toLowerCase().includes(q));
+
+  el('source').textContent = 'источник: ' + (g.source || '—');
+  el('note').textContent = g.note || '';
+  el('stat').textContent = 'показано ' + match.length + ' из ' + items.length;
+  const subs = Array.isArray(g.subgroups) ? g.subgroups : [];
+  let gridHtml = '';
+  if (subs.length) {
+    const byName = new Map(items.map(i => [i.name, i]));
+    let used = 0;
+    for (const sub of subs) {
+      const subItems = sub.items.map(n => byName.get(n)).filter(i => i && match.includes(i));
+      used += subItems.length;
+      if (!subItems.length) continue;
+      gridHtml += '<div class="subhead">' + esc(sub.name) + '</div>'
+        + (sub.note ? '<div class="subnote">' + esc(sub.note) + '</div>' : '')
+        + subItems.map(cardHtml).join('');
+    }
+    const inSubs = new Set(subs.flatMap(s => s.items));
+    const rest = match.filter(i => !inSubs.has(i.name));
+    if (rest.length) gridHtml += rest.map(cardHtml).join('');
+  } else {
+    gridHtml = match.map(cardHtml).join('');
+  }
+  el('content').innerHTML =
+    '<div class="group-head"><h2>' + esc(g.group || 'ГРУППА') + '</h2><span class="count">' + items.length + ' предметов</span></div>'
+    + (match.length ? '<div class="grid">' + gridHtml + '</div>' : '<div class="empty">Ничего не найдено.</div>');
+  [...el('tabs').children].forEach((t, i) => t.classList.toggle('active', i === currentGroup));
+  bindQuality();
+}
+
+function bindQuality() {
+  for (const box of document.querySelectorAll('.quality-box')) {
+    const input = box.querySelector('input');
+    const result = box.querySelector('.quality-result');
+    const base = Number(box.dataset.base);
+    const count = Number(box.dataset.count);
+    const sides = Number(box.dataset.sides);
+    const apply = () => {
+      const q = Number(input.value);
+      if (!Number.isFinite(q) || q < count || q > count * sides) {
+        result.textContent = '—';
+        return;
+      }
+      result.textContent = q + ' × ' + base.toLocaleString('ru-RU') + ' = ' + (q * base).toLocaleString('ru-RU') + '₽';
+    };
+    input.addEventListener('input', apply);
+    box.querySelector('.roll-quality').addEventListener('click', () => {
+      let sum = 0;
+      for (let i = 0; i < count; i++) sum += Math.floor(Math.random() * sides) + 1;
+      input.value = String(sum);
+      apply();
+    });
+  }
+}
+
+function buildTabs() {
+  const data = window.__catalog;
+  const groups = Array.isArray(data) ? data : [data];
+  el('tabs').textContent = '';
+  groups.forEach((g, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab';
+    b.innerHTML = esc(g.group || 'ГРУППА') + '<span class="n">' + (g.items || []).length + '</span>';
+    b.addEventListener('click', () => { currentGroup = i; render(el('search').value); });
+    el('tabs').appendChild(b);
+  });
+}
+
+fetch('items-catalog.json', { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(data => { window.__catalog = data; buildTabs(); render(); })
+  .catch(e => { el('content').innerHTML = '<div class="empty">Ошибка загрузки: ' + esc(e.message) + '</div>'; });
+
+el('search').addEventListener('input', (e) => render(e.target.value));
+</script>
+</body>
+</html>
