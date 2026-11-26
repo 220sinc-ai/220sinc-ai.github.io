@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eaf6ff"/>
+      <stop offset=".45" stop-color="#a8dcff"/>
+      <stop offset="1" stop-color="#2f8fd0"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <!-- ЛевыйUpper cluster -->
+    <path d="M260 90 L292 158 L272 202 L324 250 L304 300 L362 350 L340 402 L398 456" stroke="url(#bolt)" stroke-width="3" opacity=".9"/>
+    <path d="M292 158 L352 142 L376 186 L426 210" stroke="#7fc9ff" stroke-width="1.6" opacity=".7"/>
+    <path d="M324 250 L272 276 L252 326" stroke="#74c4ff" stroke-width="1.4" opacity=".62"/>
+    <path d="M362 350 L416 336 L446 382" stroke="#8fd0ff" stroke-width="1.4" opacity=".66"/>
+    <path d="M398 456 L432 508 L412 558 L464 614" stroke="url(#bolt)" stroke-width="2.4" opacity=".78"/>
+    <path d="M432 508 L486 492 L512 532" stroke="#5fb6ea" stroke-width="1.3" opacity=".55"/>
+
+    <!-- ПравыйUpper cluster -->
+    <path d="M1280 70 L1244 138 L1266 182 L1212 232 L1234 286 L1174 338 L1198 396 L1142 452" stroke="url(#bolt)" stroke-width="2.8" opacity=".86"/>
+    <path d="M1244 138 L1188 122 L1166 166 L1118 190" stroke="#7fc9ff" stroke-width="1.5" opacity=".66"/>
+    <path d="M1212 232 L1264 258 L1286 310" stroke="#74c4ff" stroke-width="1.3" opacity=".58"/>
+    <path d="M1174 338 L1124 324 L1096 368" stroke="#8fd0ff" stroke-width="1.3" opacity=".62"/>
+    <path d="M1142 452 L1106 504 L1128 556 L1076 606" stroke="url(#bolt)" stroke-width="2.2" opacity=".72"/>
+
+    <!-- ЦентральныйLower cluster -->
+    <path d="M770 520 L806 590 L784 636 L840 686 L818 740 L880 794 L858 850 L918 914" stroke="url(#bolt)" stroke-width="3.2" opacity=".92"/>
+    <path d="M806 590 L872 572 L898 618 L950 642" stroke="#83cbff" stroke-width="1.7" opacity=".72"/>
+    <path d="M840 686 L784 714 L766 766" stroke="#74c4ff" stroke-width="1.5" opacity=".63"/>
+    <path d="M880 794 L938 780 L966 826" stroke="#c9ecff" stroke-width="1.5" opacity=".68"/>
+    <path d="M918 914 L950 964 L934 1000" stroke="#58aede" stroke-width="1.8" opacity=".5"/>
+
+    <!-- Мелкие разряды вокруг -->
+    <path d="M520 170 L546 218 L528 254 L568 296" stroke="#8fd0ff" stroke-width="1.6" opacity=".55"/>
+    <path d="M1000 120 L978 168 L996 206 L958 248" stroke="#7fc9ff" stroke-width="1.4" opacity=".5"/>
+    <path d="M640 360 L668 408 L650 444 L690 486" stroke="#74c4ff" stroke-width="1.3" opacity=".48"/>
+    <path d="M1020 420 L1048 468 L1030 506 L1070 548" stroke="#83cbff" stroke-width="1.3" opacity=".5"/>
+    <path d="M300 720 L328 768 L310 806 L350 850" stroke="#74c4ff" stroke-width="1.4" opacity=".5"/>
+    <path d="M1320 700 L1292 748 L1310 788 L1270 830" stroke="#7fc9ff" stroke-width="1.3" opacity=".48"/>
+
+    <!-- Дополнительные ответвления -->
+    <path d="M272 202 L224 190 L200 226" stroke="#7fc9ff" stroke-width="1.2" opacity=".5"/>
+    <path d="M304 300 L250 330 L232 376" stroke="#74c4ff" stroke-width="1.1" opacity=".46"/>
+    <path d="M340 402 L292 430 L278 472" stroke="#8fd0ff" stroke-width="1.1" opacity=".48"/>
+    <path d="M412 558 L372 590 L358 632" stroke="#5fb6ea" stroke-width="1" opacity=".42"/>
+    <path d="M1266 182 L1312 170 L1338 206" stroke="#7fc9ff" stroke-width="1.2" opacity=".48"/>
+    <path d="M1234 286 L1282 314 L1300 358" stroke="#74c4ff" stroke-width="1.1" opacity=".45"/>
+    <path d="M1198 396 L1244 424 L1258 468" stroke="#8fd0ff" stroke-width="1.1" opacity=".46"/>
+    <path d="M1128 556 L1088 586 L1072 628" stroke="#58aede" stroke-width="1" opacity=".4"/>
+    <path d="M784 636 L738 620 L712 656" stroke="#74c4ff" stroke-width="1.2" opacity=".48"/>
+    <path d="M818 740 L770 770 L752 812" stroke="#83cbff" stroke-width="1.1" opacity=".46"/>
+    <path d="M858 850 L812 880 L798 922" stroke="#58aede" stroke-width="1" opacity=".4"/>
+    <path d="M950 642 L990 628 L1014 664" stroke="#83cbff" stroke-width="1.1" opacity=".45"/>
+    <path d="M546 218 L508 204 L490 238" stroke="#8fd0ff" stroke-width="1" opacity=".42"/>
+    <path d="M978 168 L1018 154 L1038 188" stroke="#7fc9ff" stroke-width="1" opacity=".4"/>
+    <path d="M668 408 L628 396 L610 430" stroke="#74c4ff" stroke-width="1" opacity=".4"/>
+    <path d="M1048 468 L1088 454 L1106 488" stroke="#83cbff" stroke-width="1" opacity=".42"/>
+    <path d="M328 768 L292 756 L274 790" stroke="#74c4ff" stroke-width="1" opacity=".4"/>
+    <path d="M1292 748 L1330 736 L1348 770" stroke="#7fc9ff" stroke-width="1" opacity=".4"/>
+  </g>
+</svg>

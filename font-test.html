@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Amaz';
+    src: url('amaz.ttf') format('truetype');
+  }
+  body { background: #2a2620; color: #d8c9a0; font-family: Arial, sans-serif; padding: 20px; }
+  h1 { font-size: 18px; }
+  .sample {
+    background: #3a342a;
+    border: 2px solid #6a5a38;
+    padding: 12px;
+    margin: 10px 0;
+    font-family: 'Amaz', monospace;
+    color: #e8d8a8;
+  }
+  .digits { font-size: 48px; letter-spacing: 8px; }
+  .label { font-size: 20px; letter-spacing: 4px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cell { border: 1px solid #6a5a38; padding: 6px 10px; text-align: center; }
+  .cell .n { font-family: 'Amaz', monospace; font-size: 40px; display: block; }
+</style>
+</head>
+<body>
+<h1>Тест шрифта ParaGraphRegularAmazS</h1>
+
+<div class="sample digits">0123456789</div>
+<div class="sample label">КОМБИНЕЗОН "ЦИФОРА" — КОСТЮМ СВОБОДЫ</div>
+
+<div class="row">
+  <div class="cell"><span class="n">3</span>класс</div>
+  <div class="cell"><span class="n">5</span>класс</div>
+  <div class="cell"><span class="n">4</span>разрыв</div>
+  <div class="cell"><span class="n">2</span>рад</div>
+  <div class="cell"><span class="n">1</span>хим</div>
+  <div class="cell"><span class="n">7</span>цифра</div>
+</div>
+
+<div class="sample digits">17.300 35.600</div>
+</body>
+</html>

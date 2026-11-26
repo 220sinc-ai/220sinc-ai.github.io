@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПДА-2М — предпросмотр телефона</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #14170f;
+    font-family: "Roboto", "Segoe UI", system-ui, sans-serif;
+    color: #d8d9c3;
+    overflow: hidden;
+  }
+  .hint {
+    position: fixed;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: .08em;
+    color: #8f9a75;
+    white-space: nowrap;
+  }
+  .phone {
+    position: absolute;
+    left: 24px;
+    top: 56px;
+    width: 398px;
+    border: 1px solid #465533;
+    border-radius: 16px;
+    background: #060906;
+    box-shadow: 0 18px 50px rgba(0,0,0,.7);
+    overflow: hidden;
+  }
+  .phone-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: linear-gradient(180deg, #1d2615, #10160d);
+    border-bottom: 1px solid #2d3922;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+  }
+  .phone-bar span {
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: #b6bd9b;
+  }
+  .phone-bar button {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid #4b5b36;
+    background: #0b1008;
+    color: #d8d9c3;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .phone-bar button:hover { border-color: #e3a72f; color: #e3a72f; }
+  .screen { height: calc(100vh - 92px); min-height: 480px; }
+  .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+</style>
+</head>
+<body>
+  <div class="hint">ПЕРЕТАСКИВАЙТЕ ЗА ВЕРХНЮЮ ПОЛОСУ · × — ЗАКРЫТЬ ОКНО</div>
+  <div class="phone" id="phone">
+    <div class="phone-bar" id="dragBar">
+      <span>ПДА-2М // ЭКРАН ТЕЛЕФОНА</span>
+      <button type="button" id="closeBtn" aria-label="Закрыть">×</button>
+    </div>
+    <div class="screen"><iframe id="appFrame" src="./index.html"></iframe></div>
+  </div>
+
+<script>
+(function () {
+  const phone = document.getElementById('phone');
+  const bar = document.getElementById('dragBar');
+  const closeBtn = document.getElementById('closeBtn');
+  const frame = document.getElementById('appFrame');
+
+  closeBtn.addEventListener('click', () => phone.remove());
+
+  let dragging = false;
+  let startX = 0, startY = 0, left = 0, top = 0;
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target === closeBtn) return;
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    left = phone.offsetLeft; top = phone.offsetTop;
+    bar.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  bar.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const maxX = window.innerWidth - phone.offsetWidth - 4;
+    const maxY = window.innerHeight - 40;
+    phone.style.left = Math.max(4, Math.min(maxX, left + e.clientX - startX)) + 'px';
+    phone.style.top = Math.max(4, Math.min(maxY, top + e.clientY - startY)) + 'px';
+  });
+  bar.addEventListener('pointerup', () => { dragging = false; });
+  bar.addEventListener('pointercancel', () => { dragging = false; });
+
+  frame.addEventListener('load', () => {
+    const win = frame.contentWindow;
+    try {
+      Object.defineProperty(win.Navigator.prototype, 'maxTouchPoints', { get: () => 5, configurable: true });
+    } catch (e) { /* не критично */ }
+    try {
+      const realMatchMedia = win.matchMedia.bind(win);
+      win.matchMedia = (query) => {
+        if (String(query).includes('pointer: coarse')) {
+          return { matches: true, media: query, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent() { return true; } };
+        }
+        return realMatchMedia(query);
+      };
+    } catch (e) { /* не критично */ }
+    try {
+      const doc = frame.contentDocument;
+      const tab = doc.getElementById('tab-health');
+      if (tab) tab.click();
+    } catch (e) { /* не критично */ }
+  });
+})();
+</script>
+</body>
+</html>
